@@ -1,2 +1,2 @@
-# tp4_merkle_wenxiao_wang
+# Merkle Trees for Distributed Audit Logs
  
