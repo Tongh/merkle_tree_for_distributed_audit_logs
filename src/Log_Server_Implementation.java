@@ -39,6 +39,7 @@ public class Log_Server_Implementation extends UnicastRemoteObject implements Lo
                 index++;
                 Merkle_tree node = new Merkle_tree(line);
                 node.beginning_index = node.ending_index = index;
+                root = getRoot().addNode(node);
             }
 
         }

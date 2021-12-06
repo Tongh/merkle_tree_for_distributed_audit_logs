@@ -43,6 +43,10 @@ public class Merkle_tree implements Serializable
 
     public String getHashString()
     {
+        if (hash_value == null)
+        {
+            return "";
+        }
         return new String(HexBin.encode(hash_value));
     }
 
@@ -51,6 +55,7 @@ public class Merkle_tree implements Serializable
         LinkedList<Merkle_tree> quee = new LinkedList<Merkle_tree>();
         quee.add(this);
         Merkle_tree temp;
+        Merkle_tree lastNode = null;
         boolean bIsDepthFound = false;
         while (!quee.isEmpty())
         {
@@ -61,16 +66,16 @@ public class Merkle_tree implements Serializable
                 if (!temp.left_tree.bIsLeaf)
                 {
                     quee.add(temp.left_tree);
-                    bIsDepthFound = true;
                 }
                 else
                 {
-                    break;
+                    bIsDepthFound = true;
                 }
             }
             else
             {
                 temp.setLeft_tree(node);
+                return this;
             }
             if (temp.right_tree != null)
             {
@@ -78,20 +83,80 @@ public class Merkle_tree implements Serializable
                 {
                     quee.add(temp.right_tree);
                 }
-                else
-                {
-                    break;
-                }
             }
             else if(bIsDepthFound)
             {
                 temp.setRight_tree(node);
+                return this;
+            }
+            else
+            {
+                lastNode = temp;
             }
 
             bIsDepthFound = false;
         }
 
-        return null;
+        if (lastNode != null)
+        {
+            Merkle_tree newNode = new Merkle_tree();
+            newNode.setLeft_tree(node);
+            lastNode.setRight_tree(newNode);
+            return this;
+        }
+
+        Merkle_tree newRoot = null;
+        Merkle_tree newParent = null;
+        for (int i = 0; i < computeTreeDepth(this); i++)
+        {
+            Merkle_tree newNode = new Merkle_tree();
+            if (i == 0)
+            {
+                newRoot = newNode;
+                newRoot.setLeft_tree(this);
+            }
+            else if (i == 1)
+            {
+                newParent.setRight_tree(newNode);
+            }
+            else
+            {
+                newParent.setLeft_tree(newNode);
+            }
+            newParent = newNode;
+        };
+        newParent.setLeft_tree(node);
+        return newRoot;
+    }
+
+    public void displayTree()
+    {
+        LinkedList<Merkle_tree> quee = new LinkedList<Merkle_tree>();
+        quee.add(this);
+        Merkle_tree temp;
+        while (!quee.isEmpty())
+        {
+            temp = quee.remove();
+
+            if (temp.bIsLeaf)
+            {
+                System.out.println(temp.eventString + "\t" + temp.getHashString());
+            }
+            else
+            {
+                System.out.println("Node:" + temp.beginning_index + " - " +
+                        temp.ending_index + "\t" + temp.getHashString());
+            }
+
+            if (temp.left_tree != null)
+            {
+                quee.add(temp.left_tree);
+            }
+            if (temp.right_tree != null)
+            {
+                quee.add(temp.right_tree);
+            }
+        }
     }
 
     public void setLeft_tree(Merkle_tree node)
@@ -144,7 +209,7 @@ public class Merkle_tree implements Serializable
     {
         try
         {
-            digest = MessageDigest.getInstance("SHA256");
+            digest = MessageDigest.getInstance("SHA-256");
         }
         catch (NoSuchAlgorithmException e)
         {
@@ -168,5 +233,16 @@ public class Merkle_tree implements Serializable
             return "";
         }
         return right_tree.getHashString();
+    }
+
+    public static int computeTreeDepth(Merkle_tree root)
+    {
+        if (root == null)
+        {
+            return 0;
+        }
+        int lDepth = computeTreeDepth(root.left_tree);
+        int rDepth = computeTreeDepth(root.right_tree);
+        return lDepth >= rDepth ? lDepth + 1 : rDepth + 1;
     }
 }

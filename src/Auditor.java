@@ -17,4 +17,13 @@ public class Auditor
     {
         return false;
     }
+
+    public Merkle_tree getRoot() throws RemoteException {
+        root = log.getRoot();
+        return root;
+    }
+
+    public void displayLogs() throws RemoteException {
+        getRoot().displayTree();
+    }
 }
