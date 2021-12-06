@@ -70,12 +70,53 @@ public class Log_Server_Implementation extends UnicastRemoteObject implements Lo
     @Override
     public List<Merkle_tree> genPath(int index) throws RemoteException
     {
-        return null;
+        List<Merkle_tree> ret = new ArrayList<>();
+
+        Merkle_tree node = root.getNode(index);
+        Merkle_tree parent = node.parent;
+        while (parent != null)
+        {
+            ret.add(node.getBrother());
+            node = parent;
+            parent = node.parent;
+        }
+
+        System.out.println("genPath(" + index + "): " + getStringListNode(ret));
+
+        return ret;
     }
 
     @Override
     public List<Merkle_tree> genProof(int tree_size) throws RemoteException
     {
-        return null;
+        List<Merkle_tree> ret = new ArrayList<>();
+
+        Merkle_tree node = root.getNode(tree_size);
+        node = node.parent;
+        ret.add(node);
+        Merkle_tree parent = node.parent;
+        while (parent != null)
+        {
+            ret.add(node.getBrother());
+            node = parent;
+            parent = node.parent;
+        }
+
+        System.out.println("genProof(" + tree_size + "): " + getStringListNode(ret));
+
+        return ret;
+    }
+
+    public String getStringListNode(List<Merkle_tree> nodes)
+    {
+        String ret = "[";
+        for (Merkle_tree node : nodes)
+        {
+            ret += node.getNodeString();
+            ret += ", ";
+        }
+        ret = ret.substring(0, ret.length() - 2);
+        ret += "]";
+        return ret;
     }
 }

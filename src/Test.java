@@ -19,5 +19,8 @@ public class Test
         System.out.println("Log 13 is in Logs: " + auditor.isMember("Log 13"));
         auditor.displayLogs();
 
+        server.genPath(4);
+        server.genProof(6);
+
     }
 }

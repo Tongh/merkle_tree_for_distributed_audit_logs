@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Merkle_tree implements Serializable
 {
@@ -164,15 +165,7 @@ public class Merkle_tree implements Serializable
                 depth = temp.getHeigthToRoot();
             }
 
-            if (temp.bIsLeaf)
-            {
-                System.out.println(temp.eventString + "\t" + temp.getHashString());
-            }
-            else
-            {
-                System.out.println("Node:" + temp.beginning_index + " - " +
-                        temp.ending_index + "\t" + temp.getHashString());
-            }
+            temp.displayNode();
 
             if (temp.left_tree != null)
             {
@@ -184,6 +177,31 @@ public class Merkle_tree implements Serializable
             }
         }
         System.out.println("-----------------FINISHED----------------------");
+    }
+
+    public void displayNode()
+    {
+        if (bIsLeaf)
+        {
+            System.out.println(eventString + "\t" + getHashString());
+        }
+        else
+        {
+            System.out.println("Node:" + beginning_index + " - " +
+                    ending_index + "\t" + getHashString());
+        }
+    }
+
+    public String getNodeString()
+    {
+        if (bIsLeaf)
+        {
+            return "Node:" + beginning_index;
+        }
+        else
+        {
+            return "Node:" + beginning_index + " - " + ending_index;
+        }
     }
 
     public void setLeft_tree(Merkle_tree node)
@@ -263,6 +281,39 @@ public class Merkle_tree implements Serializable
             return this;
         }
         return parent.getRoot();
+    }
+
+    public Merkle_tree getNode(int index)
+    {
+        if (beginning_index == index && ending_index == index)
+        {
+            return this;
+        }
+        if (index <= left_tree.ending_index)
+        {
+            return left_tree.getNode(index);
+        }
+        if (index >= right_tree.beginning_index)
+        {
+            return right_tree.getNode(index);
+        }
+        return null;
+    }
+
+    public Merkle_tree getBrother()
+    {
+        if (parent != null)
+        {
+            if (parent.left_tree == this)
+            {
+                return parent.right_tree;
+            }
+            else
+            {
+                return parent.left_tree;
+            }
+        }
+        return null;
     }
 
     public static int computeTreeDepth(Merkle_tree root)
