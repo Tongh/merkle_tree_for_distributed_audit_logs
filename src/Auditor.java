@@ -15,7 +15,7 @@ public class Auditor
 
     public boolean isMember(String event) throws Exception
     {
-        return false;
+        return getRoot().isMember(event);
     }
 
     public Merkle_tree getRoot() throws RemoteException {

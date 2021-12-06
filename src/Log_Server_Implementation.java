@@ -1,6 +1,7 @@
 import java.io.*;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Log_Server_Implementation extends UnicastRemoteObject implements Log_Server_Interface
@@ -28,6 +29,7 @@ public class Log_Server_Implementation extends UnicastRemoteObject implements Lo
             InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
             BufferedReader br = new BufferedReader(reader);
             String line = "";
+            List<String> events = new ArrayList<>();
             int index = 0;
             while (true)
             {
@@ -36,11 +38,10 @@ public class Log_Server_Implementation extends UnicastRemoteObject implements Lo
                 {
                     break;
                 }
-                index++;
-                Merkle_tree node = new Merkle_tree(line);
-                node.beginning_index = node.ending_index = index;
-                root = getRoot().addNode(node);
+                events.add(line);
             }
+
+            addEvents(events);
 
         }
         catch (Exception e)
@@ -53,13 +54,17 @@ public class Log_Server_Implementation extends UnicastRemoteObject implements Lo
     public void addEvent(String event) throws RemoteException
     {
         Merkle_tree node = new Merkle_tree(event);
-
+        node.beginning_index = node.ending_index = root.ending_index + 1;
+        root = getRoot().addNode(node);
     }
 
     @Override
-    public void addEvents(List<String> event) throws RemoteException
+    public void addEvents(List<String> events) throws RemoteException
     {
-
+        for (String event :events)
+        {
+            addEvent(event);
+        }
     }
 
     @Override

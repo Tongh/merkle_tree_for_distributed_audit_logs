@@ -99,10 +99,28 @@ public class Merkle_tree implements Serializable
 
         if (lastNode != null)
         {
-            Merkle_tree newNode = new Merkle_tree();
-            newNode.setLeft_tree(node);
-            lastNode.setRight_tree(newNode);
-            return this;
+            int depth = computeTreeDepth(getRoot());
+            int heigtToRoot = lastNode.getHeigthToRoot() + 1;
+            for (int i = heigtToRoot; i < depth; i++)
+            {
+                if (i == depth - 1)
+                {
+                    lastNode.setLeft_tree(node);
+                    return getRoot();
+                }
+                else if (i == heigtToRoot)
+                {
+                    Merkle_tree newNode = new Merkle_tree();
+                    lastNode.setRight_tree(newNode);
+                    lastNode = newNode;
+                }
+                else
+                {
+                    Merkle_tree newNode = new Merkle_tree();
+                    lastNode.setLeft_tree(newNode);
+                    lastNode = newNode;
+                }
+            };
         }
 
         Merkle_tree newRoot = null;
@@ -134,9 +152,17 @@ public class Merkle_tree implements Serializable
         LinkedList<Merkle_tree> quee = new LinkedList<Merkle_tree>();
         quee.add(this);
         Merkle_tree temp;
+        int depth = 0;
+        System.out.println("-----------------depth :" + depth + "----------------------");
         while (!quee.isEmpty())
         {
             temp = quee.remove();
+
+            if (temp.getHeigthToRoot() != depth)
+            {
+                System.out.println("-----------------depth :" + (depth + 1) + "----------------------");
+                depth = temp.getHeigthToRoot();
+            }
 
             if (temp.bIsLeaf)
             {
@@ -157,6 +183,7 @@ public class Merkle_tree implements Serializable
                 quee.add(temp.right_tree);
             }
         }
+        System.out.println("-----------------FINISHED----------------------");
     }
 
     public void setLeft_tree(Merkle_tree node)
@@ -205,6 +232,50 @@ public class Merkle_tree implements Serializable
         }
     }
 
+    public boolean isMember(String event)
+    {
+        if (bIsLeaf)
+        {
+            if (eventString.equals(event))
+            {
+                return true;
+            }
+            return false;
+        }
+        boolean left = left_tree == null ? false : left_tree.isMember(event);
+        boolean right = right_tree == null ? false : right_tree.isMember(event);
+        return left | right;
+    }
+
+    public int getHeigthToRoot()
+    {
+        if (parent == null)
+        {
+            return 0;
+        }
+        return 1 + parent.getHeigthToRoot();
+    }
+
+    public Merkle_tree getRoot()
+    {
+        if (parent == null)
+        {
+            return this;
+        }
+        return parent.getRoot();
+    }
+
+    public static int computeTreeDepth(Merkle_tree root)
+    {
+        if (root == null)
+        {
+            return 0;
+        }
+        int lDepth = computeTreeDepth(root.left_tree);
+        int rDepth = computeTreeDepth(root.right_tree);
+        return lDepth >= rDepth ? lDepth + 1 : rDepth + 1;
+    }
+
     private void init()
     {
         try
@@ -233,16 +304,5 @@ public class Merkle_tree implements Serializable
             return "";
         }
         return right_tree.getHashString();
-    }
-
-    public static int computeTreeDepth(Merkle_tree root)
-    {
-        if (root == null)
-        {
-            return 0;
-        }
-        int lDepth = computeTreeDepth(root.left_tree);
-        int rDepth = computeTreeDepth(root.right_tree);
-        return lDepth >= rDepth ? lDepth + 1 : rDepth + 1;
     }
 }
