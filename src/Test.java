@@ -11,12 +11,12 @@ public class Test
         Auditor auditor = new Auditor(server);
         auditor.displayLogs();
 
-        System.out.println("Log 5 is in Logs: " + auditor.isMember("Log 5"));
-        System.out.println("Log 13 is in Logs: " + auditor.isMember("Log 13"));
+        System.out.println("Log 5 is in Logs(isMember): " + auditor.isMember("Log 5"));
+        System.out.println("Log 13 is in Logs(isMember): " + auditor.isMember("Log 13"));
 
         server.addEvent("Log 13");
         System.out.println("Running : server.addEvent(\"Log 13\")");
-        System.out.println("Log 13 is in Logs: " + auditor.isMember("Log 13"));
+        System.out.println("Log 13 is in Logs(isMember): " + auditor.isMember("Log 13"));
         auditor.displayLogs();
 
         server.genPath(4);

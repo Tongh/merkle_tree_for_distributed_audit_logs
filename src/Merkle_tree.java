@@ -250,19 +250,31 @@ public class Merkle_tree implements Serializable
         }
     }
 
-    public boolean isMember(String event)
+    public int isMember(String event)
     {
         if (bIsLeaf)
         {
             if (eventString.equals(event))
             {
-                return true;
+                return beginning_index;
             }
-            return false;
+            return -1;
         }
-        boolean left = left_tree == null ? false : left_tree.isMember(event);
-        boolean right = right_tree == null ? false : right_tree.isMember(event);
-        return left | right;
+        int left = left_tree == null ? -1 : left_tree.isMember(event);
+        int right = right_tree == null ? -1 : right_tree.isMember(event);
+        return left == -1 ? right : left;
+    }
+
+    public boolean isLeftNode()
+    {
+        double nodesNum = Math.pow(2.0, computeTreeDepth(this));
+        double halfNum = nodesNum / 2.0;
+        double index = (double)beginning_index % nodesNum;
+        if (index != 0 && index <= halfNum)
+        {
+            return true;
+        }
+        return false;
     }
 
     public int getHeigthToRoot()

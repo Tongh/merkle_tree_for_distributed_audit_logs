@@ -30,7 +30,6 @@ public class Log_Server_Implementation extends UnicastRemoteObject implements Lo
             BufferedReader br = new BufferedReader(reader);
             String line = "";
             List<String> events = new ArrayList<>();
-            int index = 0;
             while (true)
             {
                 line = br.readLine();
